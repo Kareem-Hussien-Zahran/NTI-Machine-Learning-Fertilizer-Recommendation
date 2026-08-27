@@ -1,371 +1,194 @@
-# 🌱 Fertilizer Recommendation using Machine Learning
+# 🌱 Fertilizer Recommendation System
 
-## 📌 Project Overview
+A Machine Learning project that recommends the most suitable fertilizer
+based on soil conditions, crop characteristics, environmental
+conditions, and previous-season agricultural information.
 
-This project is about predicting the **best fertilizer** for a specific agricultural situation.
+## Problem
 
-The model uses information about the soil, crop, weather, irrigation, previous crop, and previous fertilizer usage to recommend a fertilizer.
+Farmers need to select the appropriate fertilizer according to several
+interacting factors. Soil properties, crop type and growth stage,
+weather conditions, irrigation, previous crops, and previous fertilizer
+usage can all influence the fertilizer recommendation.
 
-The dataset contains **10,000 records** and the target variable is:
+Choosing a suitable fertilizer manually can therefore be challenging.
+The objective of this project is to build a **Machine Learning
+classification system** that learns from historical agricultural data
+and predicts the most suitable fertilizer for a new set of conditions.
 
-`Recommended_Fertilizer`
+The target variable is **Recommended_Fertilizer**, which contains seven
+fertilizer classes.
 
----
+## Dataset
 
-## 🎯 Project Goal
-
-The main goal is to build a classification model that can predict the suitable fertilizer based on different agricultural features.
-
-The target contains 7 fertilizer classes:
-
-- Urea
-- DAP
-- MOP
-- Compost
-- Zinc Sulphate
-- NPK
-- SSP
-
-The classes are not balanced. For example, Urea and DAP have much more samples than SSP.
-
----
-
-## 📊 Dataset Features
-
-The dataset contains different types of information:
+The dataset contains **10,000 samples** and combines numerical and
+categorical agricultural features.
 
 ### Soil Information
 
-- Soil Type
-- Soil pH
-- Soil Moisture
-- Organic Carbon
-- Electrical Conductivity
+-   Soil Type
+-   Soil pH
+-   Soil Moisture
+-   Organic Carbon
+-   Electrical Conductivity
+-   Nitrogen Level
+-   Phosphorus Level
+-   Potassium Level
 
-### Nutrient Information
+### Crop & Agricultural Information
 
-- Nitrogen Level
-- Phosphorus Level
-- Potassium Level
+-   Crop Type
+-   Crop Growth Stage
+-   Previous Crop
+-   Irrigation Type
+-   Fertilizer Used Last Season
+-   Yield Last Season
 
-### Weather Information
+### Environmental Information
 
-- Temperature
-- Humidity
-- Rainfall
-
-### Crop Information
-
-- Crop Type
-- Crop Growth Stage
-- Previous Crop
-- Season
-
-### Farm Information
-
-- Irrigation Type
-- Region
-- Fertilizer Used Last Season
-- Yield Last Season
+-   Temperature
+-   Humidity
+-   Rainfall
+-   Season
+-   Region
 
 ### Target
 
-- Recommended Fertilizer
+-   Recommended Fertilizer
 
-These features can be seen directly in the notebook dataset.
+## Data Preparation
 
----
+The dataset was explored to understand its structure, feature types, and
+target distribution.
 
-## 🔎 Data Preparation
+A complete missing-value analysis was performed. No missing values were
+found across the dataset, so no missing-value imputation was required.
 
-First, the dataset is loaded using Pandas.
+The target variable was separated from the input features. Categorical
+features were identified, including soil type, crop type, crop growth
+stage, season, irrigation type, previous crop, and region.
 
-```python
-df = pd.read_csv("fertilizer_recommendation.csv")
-```
+Different preprocessing approaches were considered according to the
+requirements of each Machine Learning model. The target variable was
+encoded for model training, while categorical input features were
+prepared for models that required numerical representations. CatBoost
+was also evaluated using its ability to work directly with categorical
+features.
 
-Then the data is divided into:
+The dataset was divided into **80% training data and 20% testing data**,
+with stratification used to preserve the distribution of fertilizer
+classes.
 
-```python
-X = df.drop("Recommended_Fertilizer", axis=1)
-Y = df["Recommended_Fertilizer"]
-```
+## Class Imbalance
 
-So:
+The distribution of the fertilizer classes was analyzed before model
+training because the classes were not perfectly balanced.
 
-- `X` → input features
-- `Y` → target variable
+To reduce the impact of class imbalance, appropriate class-weighting
+approaches were used during model training.
 
----
+Because accuracy alone can be misleading when classes are imbalanced,
+the models were evaluated using **Accuracy, Macro Precision, Macro
+Recall, and Macro F1** in addition to training time.
 
-## 🔤 Categorical Features
+## Model Comparison
 
-The dataset contains several categorical columns.
+Four classification models were evaluated:
 
-The notebook automatically finds them:
+-   Random Forest
+-   CatBoost
+-   LightGBM
+-   XGBoost
 
-```python
-cat_features = X.select_dtypes(
-    include=["object", "category"]
-).columns.tolist()
-```
+The comparison was based on predictive performance and training time.
 
-The categorical columns are:
+  -------------------------------------------------------------------------------
+  Model              Accuracy    Precision       Recall     Macro F1     Training
+                                                                             Time
+  -------------- ------------ ------------ ------------ ------------ ------------
+  **XGBoost**      **87.20%**       75.64%       74.05%       74.56% **4.86 sec**
 
-- Soil_Type
-- Crop_Type
-- Crop_Growth_Stage
-- Season
-- Irrigation_Type
-- Previous_Crop
-- Region
+  **LightGBM**         87.15%       77.67%       79.33%       76.35%     9.83 sec
 
-They are converted to Pandas categorical type.
+  **Random             86.80%       86.32%       83.47%       79.27%     5.85 sec
+  Forest**                                                           
 
-This is useful because **CatBoost and LightGBM can work with categorical features directly**.
+  **CatBoost**         86.55%   **86.56%**   **83.77%**   **79.34%**    47.58 sec
+  -------------------------------------------------------------------------------
 
----
+## Final Model
 
-## 🎯 Target Encoding
+Although **XGBoost achieved the highest accuracy at 87.20%**, CatBoost
+achieved the highest **Macro F1 score at 79.34%**, together with the
+highest Macro Precision and Macro Recall among the evaluated models.
 
-The target variable is converted from fertilizer names into numerical class labels using `LabelEncoder`.
+CatBoost was selected as the final model for the recommendation
+application because of its strong overall classification performance and
+its suitability for datasets containing categorical agricultural
+features.
 
-```python
-encoder = LabelEncoder()
+The trained model is used to generate fertilizer recommendations for
+previously unseen input data.
 
-Y = encoder.fit_transform(Y)
-```
+## Interactive Interface
 
-This is done because the classification models work with numerical class labels.
+The project is not limited to model training and evaluation. The trained
+model was integrated into a **Streamlit interactive web interface**.
 
----
+The interface allows any user to enter new agricultural information,
+including:
 
-# 🤖 Models
+-   Soil characteristics
+-   Crop information
+-   Environmental conditions
+-   Irrigation and regional information
+-   Previous-season fertilizer usage
+-   Previous-season yield
 
-In this project, different boosting models are tested.
+After entering the required information, the user can submit the new
+data and receive a **fertilizer recommendation generated by the trained
+Machine Learning model**.
 
-## 1. CatBoost
+### 🚀 Live Interface
 
-CatBoost is trained with:
+**Try the deployed application:**\
+`YOUR_STREAMLIT_APP_URL`
 
-- 500 iterations
-- Learning rate = 0.01
-- Depth = 3
-- Random seed = 42
-- Balanced class weights
+> Replace `YOUR_STREAMLIT_APP_URL` with the deployed Streamlit
+> application URL.
 
-```python
-CatBoostClassifier(
-    iterations=500,
-    learning_rate=0.01,
-    depth=3,
-    random_seed=42,
-    auto_class_weights="Balanced"
-)
-```
+This makes the project usable as a real prediction application rather
+than only an offline Machine Learning experiment.
 
-The balanced class weights are used because the target classes are imbalanced.
+## About Me
 
----
+### Kareem Hussien Abdelmonm Tawfik
 
-## 2. LightGBM
+I am a Computer Science and Artificial Intelligence student with a focus
+on **AI & Data Science** and an interest in building practical Machine
+Learning and Data-driven applications.
 
-LightGBM is also used for the classification problem.
+My learning journey covers areas including **Data Analysis, Machine
+Learning, Deep Learning, Generative AI, Agentic AI, and Business
+Intelligence**. I also work with technologies such as Python, Pandas,
+Scikit-learn, CatBoost, LightGBM, XGBoost, SQL, Excel, and Power BI.
 
-The model uses:
+I enjoy turning raw data into useful insights and building Machine
+Learning solutions that can be integrated into practical applications.
 
-```python
-LGBMClassifier(
-    n_estimators=500,
-    learning_rate=0.01,
-    max_depth=5,
-    random_state=42,
-    min_child_samples=1,
-    class_weight="balanced"
-)
-```
+This project represents my work in applying the complete Machine
+Learning workflow, from understanding and preparing the data to
+comparing models, selecting a final model, and deploying it through an
+interactive interface.
 
-The `class_weight="balanced"` option helps the model deal with the imbalanced target classes.
+## Project Workflow
 
-LightGBM also receives the categorical features directly.
+**Problem Definition → Data Exploration → Data Quality Check → Feature
+Preparation → Class Imbalance Analysis → Model Training → Model
+Comparison → Evaluation → Model Selection → Deployment → Interactive
+Prediction**
 
----
+------------------------------------------------------------------------
 
-# 📈 Evaluation Metrics
-
-The models are evaluated using several metrics:
-
-- Accuracy
-- Precision
-- Recall
-- Macro F1 Score
-- Classification Report
-
-The notebook also measures the **training time** of the models.
-
-### Why Macro F1?
-
-The dataset is imbalanced, so accuracy alone is not enough.
-
-Macro F1 gives equal importance to each class, including classes with fewer samples.
-
----
-
-# 📊 Confusion Matrix
-
-A confusion matrix is used to see how the model predicts each fertilizer class.
-
-For LightGBM:
-
-```python
-cm = confusion_matrix(Y, y_predict_LGB)
-
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm
-)
-
-disp.plot(
-    xticks_rotation=45
-)
-```
-
-This helps us see which fertilizer classes are predicted correctly and which classes are confused with each other.
-
----
-
-# 🏆 Results
-
-The notebook currently shows the following LightGBM results:
-
-| Metric | LightGBM |
-|---|---:|
-| Training Time | 7.87 seconds |
-| Accuracy | 93.43% |
-| Macro F1 | 86.95% |
-| Precision | 86.65% |
-| Recall | 93.57% |
-
-These results are from the notebook's current evaluation.
-
-CatBoost results shown in the notebook:
-
-| Metric | CatBoost |
-|---|---:|
-| Training Time | 87.43 seconds |
-| Accuracy | 87.91% |
-| Macro F1 | 80.22% |
-| Precision | 86.07% |
-| Recall | 85.01% |
-
-
-
-Based on these results, **LightGBM performed better than CatBoost in this experiment** and was also much faster.
-
----
-
-# 🛠️ Libraries Used
-
-```text
-Python
-Pandas
-NumPy
-Scikit-learn
-CatBoost
-LightGBM
-XGBoost
-Matplotlib
-Seaborn
-```
-
-The notebook imports the main ML and evaluation libraries and installs CatBoost and LightGBM when needed. 
----
-
-# 📁 Project Structure
-
-```text
-Fertilizer-Recommendation/
-│
-├── fertilizer_recommendation.csv
-├── fertilizer_recommendation.ipynb
-└── README.md
-```
-
----
-
-# 🚀 How to Run
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/fertilizer-recommendation.git
-```
-
-### 2. Install the required libraries
-
-```bash
-pip install pandas numpy scikit-learn
-pip install catboost lightgbm xgboost
-pip install matplotlib seaborn
-```
-
-### 3. Open the notebook
-
-```bash
-jupyter notebook
-```
-
-or open it using **Google Colab**.
-
-### 4. Run the notebook cells
-
-Run the cells from top to bottom to load the dataset, prepare the data, train the models, and evaluate the results.
-
----
-
-# 💡 What I Learned
-
-Through this project, I practiced:
-
-- Data loading and exploration
-- Separating features and target
-- Working with categorical features
-- Target encoding
-- Handling imbalanced classification
-- CatBoost
-- LightGBM
-- XGBoost
-- Classification metrics
-- Confusion Matrix
-- Model training time comparison
-- Comparing different ML models
-
----
-
-# 🔮 Future Improvements
-
-Some possible improvements for the project:
-
-- Use `train_test_split` and evaluate on unseen test data
-- Add cross-validation
-- Tune the model hyperparameters
-- Compare XGBoost, LightGBM and CatBoost using the same test set
-- Add feature importance visualization
-- Add normalized confusion matrix
-- Add ROC-AUC evaluation
-- Build a simple web application for fertilizer prediction
-
----
-
-## 👨‍💻 Author
-
-**Kareem Hussien**
-
-AI & Data Science Student
-
-Interested in:
-
-- Data Analysis
-- Machine Learning
-- Artificial Intelligence
-- Generative AI
-- Agentic AI
+**🌱 Fertilizer Recommendation System**\
+*Machine Learning Project by Kareem Hussien Abdelmonm Tawfik*
