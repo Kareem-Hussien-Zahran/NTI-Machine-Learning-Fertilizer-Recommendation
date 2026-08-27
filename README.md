@@ -91,30 +91,28 @@ Because accuracy alone can be misleading when classes are imbalanced,
 the models were evaluated using **Accuracy, Macro Precision, Macro
 Recall, and Macro F1** in addition to training time.
 
-## Model Comparison
+## 📊 Model Comparison
 
-Four classification models were evaluated:
+Four Machine Learning classification models were trained and evaluated:
 
--   Random Forest
--   CatBoost
--   LightGBM
--   XGBoost
+| 🧠 Model | 🎯 Accuracy | 🎯 Precision | 🔄 Recall | ⭐ Macro F1 | ⏱️ Training Time |
+|:---|---:|---:|---:|---:|---:|
+| **XGBoost** | **87.20%** 🥇 | 75.64% | 74.05% | 74.56% | **4.86 sec** ⚡ |
+| **LightGBM** | 87.15% 🥈 | 77.67% | 79.33% | 76.35% | 9.83 sec |
+| **Random Forest** | 86.80% | 86.32% | 83.47% | 79.27% | 5.85 sec |
+| **CatBoost** | 86.55% | **86.56%** 🥇 | **83.77%** 🥇 | **79.34%** 🥇 | 47.58 sec |
 
-The comparison was based on predictive performance and training time.
+### 🏆 Performance Summary
 
-  -------------------------------------------------------------------------------
-  Model              Accuracy    Precision       Recall     Macro F1     Training
-                                                                             Time
-  -------------- ------------ ------------ ------------ ------------ ------------
-  **XGBoost**      **87.20%**       75.64%       74.05%       74.56% **4.86 sec**
+| Metric | Best Model | Result |
+|:---|:---|---:|
+| **Highest Accuracy** | XGBoost | **87.20%** |
+| **Highest Precision** | CatBoost | **86.56%** |
+| **Highest Recall** | CatBoost | **83.77%** |
+| **Highest Macro F1** | CatBoost | **79.34%** |
+| **Fastest Training** | XGBoost | **4.86 sec** |
 
-  **LightGBM**         87.15%       77.67%       79.33%       76.35%     9.83 sec
-
-  **Random             86.80%       86.32%       83.47%       79.27%     5.85 sec
-  Forest**                                                           
-
-  **CatBoost**         86.55%   **86.56%**   **83.77%**   **79.34%**    47.58 sec
-  -------------------------------------------------------------------------------
+> **Key observation:** XGBoost achieved the highest overall accuracy, while CatBoost provided the strongest balance across Precision, Recall, and Macro F1. This was particularly important because the fertilizer classes were not perfectly balanced.
 
 ## Final Model
 
