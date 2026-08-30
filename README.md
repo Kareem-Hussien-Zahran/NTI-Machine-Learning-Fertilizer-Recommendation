@@ -150,9 +150,9 @@ Machine Learning model**.
 ### 🚀 Live Interface
 
 **Try the deployed application:**\
-`YOUR_STREAMLIT_APP_URL`
+`STREAMLIT_APP_URL`
 
-> Replace `YOUR_STREAMLIT_APP_URL` with the deployed Streamlit
+`https://nti-machine-learning-fertilizer-recommendation-kareem-hussien.streamlit.app/` with the deployed Streamlit
 > application URL.
 
 This makes the project usable as a real prediction application rather
