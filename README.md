@@ -152,7 +152,7 @@ Machine Learning model**.
 **Try the deployed application:**\
 `STREAMLIT_APP_URL`
 
-`https://nti-machine-learning-fertilizer-recommendation-kareem-hussien.streamlit.app/` with the deployed Streamlit
+https://nti-machine-learning-fertilizer-recommendation-kareem-hussien.streamlit.app/ with the deployed Streamlit
 > application URL.
 
 This makes the project usable as a real prediction application rather
